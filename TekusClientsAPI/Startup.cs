@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TekusClientsAPI.Infrastructure;
 
-namespace TekusClients
+namespace TekusClientsAPI
 {
     public class Startup
     {

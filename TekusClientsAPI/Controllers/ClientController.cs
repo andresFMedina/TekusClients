@@ -14,39 +14,42 @@ namespace TekusClientsAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ServiceController : ControllerBase
+    public class ClientController : ControllerBase
     {
+
         private readonly ClientsContext _context;
 
-        public ServiceController(ClientsContext context)
+        public ClientController(ClientsContext context)
         {
             _context = context;
         }
-        // GET: api/Service
+
+
+        // GET: api/Client
         [HttpGet]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetServicesAsync(string filter, int page = 0, int pageSize = 15)
+        public async Task<IActionResult> GetClientsAsync(string filter = "", int page = 1, int pageSize = 15)
         {
-            var response = new PagedResponse<Service>();
+            var response = new PagedResponse<Client>();
 
             try
             {
 
-                List<Service> services;
+                List<Client> clients;
                 long totalResults;
 
                 if (!string.IsNullOrEmpty(filter))
                 {
                     foreach (string item in filter.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
                     {
-                        services = await _context.Services
+                        clients = await _context.Clients
                             .Where(c => c.Name.ToLower().StartsWith(item))
                             .Skip((page - 1) * pageSize)
                             .Take(pageSize)
                             .ToListAsync();
 
-                        totalResults = await _context.Services
+                        totalResults = await _context.Clients
                             .Where(c => c.Name.ToLower().StartsWith(item))
                             .LongCountAsync();
 
@@ -55,25 +58,25 @@ namespace TekusClientsAPI.Controllers
                         response.RegisterPerPages = pageSize;
                         response.TotalRegister = totalResults;
                         response.TotalPages = (int)Math.Ceiling((double)response.TotalRegister / pageSize);
-                        response.Model = services;
+                        response.Model = clients;
 
                         return response.ToHttpResponse();
                     }
-
+                    
                 }
 
-                services = await _context.Services.Skip((page - 1) * pageSize)
+                clients = await _context.Clients.Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync();
 
-                totalResults = await _context.Services.LongCountAsync();
+                totalResults = await _context.Clients.LongCountAsync();
 
                 response.CurrentFilter = filter;
                 response.CurrentPage = page;
                 response.RegisterPerPages = pageSize;
                 response.TotalRegister = totalResults;
                 response.TotalPages = (int)Math.Ceiling((double)response.TotalRegister / pageSize);
-                response.Model = services;
+                response.Model = clients;
             }
             catch (Exception ex)
             {
@@ -86,25 +89,25 @@ namespace TekusClientsAPI.Controllers
 
         }
 
-        // GET api/Services/5        
+        // GET api/Client/5        
         [HttpGet("{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-
-        public async Task<IActionResult> GetServiceByIdAsync(int id)
+        
+        public async Task<IActionResult> GetClientByIdAsync(int id)
         {
-            var response = new SingleResponse<Service>();
+            var response = new SingleResponse<Client>();
 
             try
             {
-                var service = await _context.Services.FindAsync(id);
+                var client = await _context.Clients.FindAsync(id);
 
-                if (service == null)
+                if (client == null)
                 {
                     return NotFound();
                 }
-                response.Model = service;
+                response.Model = client;
             }
             catch (Exception ex)
             {
@@ -116,23 +119,23 @@ namespace TekusClientsAPI.Controllers
         }
 
 
-        // POST: api/Serivce
+        // POST: api/Client
         [HttpPost]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(((int)HttpStatusCode.InternalServerError))]
-        public async Task<IActionResult> PostServiceAsync([FromBody] Service service)
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> PostClientAsync([FromBody] Client client)
         {
-            var response = new SingleResponse<Service>();
+            var response = new SingleResponse<Client>();
 
             try
             {
-                _context.Services.Add(service);
+                _context.Clients.Add(client);
                 await _context.SaveChangesAsync();
-                response.Model = CreatedAtAction(nameof(GetServiceByIdAsync), new { id = service.Id }, service).Value as Service;
+                response.Model = CreatedAtAction(nameof(GetClientByIdAsync), new { id = client.Id }, client).Value as Client;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 response.DidError = true;
                 response.ErrorMessage = ex.ToString();
@@ -141,32 +144,32 @@ namespace TekusClientsAPI.Controllers
             return response.ToHttpResponse();
         }
 
-        // PUT: api/Service/5
+        // PUT: api/Client/5
         [HttpPut("{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.OK)]        
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(((int)HttpStatusCode.InternalServerError))]
-        public async Task<IActionResult> PutServiceAsync(int id, [FromBody] Service service)
+        public async Task<IActionResult> PutClientAsync(int id, [FromBody] Client client)
         {
             var response = new Response();
 
-            try
+            try 
             {
-                var serviceSelected = await _context.Services.FindAsync(id);
-                var serviceUpdated = service;
-
-                if (serviceSelected == null)
+                var clientSelected = await _context.Clients.FindAsync(id);
+                var clientUpdated = client;
+                
+                if(clientSelected == null)
                 {
                     return NotFound();
                 }
-                serviceSelected.Name = serviceUpdated.Name;
-                serviceSelected.Price = serviceUpdated.Price;
+                clientSelected.Name = clientUpdated.Name;
+                clientSelected.Email = clientUpdated.Email;
 
                 await _context.SaveChangesAsync();
 
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 response.DidError = true;
                 response.ErrorMessage = ex.Message;
@@ -175,5 +178,6 @@ namespace TekusClientsAPI.Controllers
             return response.ToHttpResponse();
 
         }
+
     }
 }

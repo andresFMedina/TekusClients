@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TekusClientsAPI.Infrastructure;
@@ -13,40 +14,39 @@ namespace TekusClientsAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CountryController : ControllerBase
+    public class ServiceController : ControllerBase
     {
         private readonly ClientsContext _context;
 
-        public CountryController(ClientsContext context)
+        public ServiceController(ClientsContext context)
         {
             _context = context;
         }
-
         // GET: api/Service
         [HttpGet]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetCountriesAsync(string filter, int page = 0, int pageSize = 15)
+        public async Task<IActionResult> GetServicesAsync(string filter="", int page = 1, int pageSize = 15)
         {
-            var response = new PagedResponse<Country>();
+            var response = new PagedResponse<Service>();
 
             try
             {
 
-                List<Country> countries;
+                List<Service> services;
                 long totalResults;
 
                 if (!string.IsNullOrEmpty(filter))
                 {
                     foreach (string item in filter.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
                     {
-                        countries = await _context.Countries
+                        services = await _context.Services
                             .Where(c => c.Name.ToLower().StartsWith(item))
                             .Skip((page - 1) * pageSize)
                             .Take(pageSize)
                             .ToListAsync();
 
-                        totalResults = await _context.Countries
+                        totalResults = await _context.Services
                             .Where(c => c.Name.ToLower().StartsWith(item))
                             .LongCountAsync();
 
@@ -55,56 +55,56 @@ namespace TekusClientsAPI.Controllers
                         response.RegisterPerPages = pageSize;
                         response.TotalRegister = totalResults;
                         response.TotalPages = (int)Math.Ceiling((double)response.TotalRegister / pageSize);
-                        response.Model = countries;
+                        response.Model = services;
 
                         return response.ToHttpResponse();
                     }
 
                 }
 
-                countries = _context.Countries.Skip((page - 1) * pageSize)
+                services = await _context.Services.Skip((page - 1) * pageSize)
                     .Take(pageSize)
-                    .ToList();
+                    .ToListAsync();
 
-                totalResults = await _context.Countries.LongCountAsync();
+                totalResults = await _context.Services.LongCountAsync();
 
                 response.CurrentFilter = filter;
                 response.CurrentPage = page;
                 response.RegisterPerPages = pageSize;
                 response.TotalRegister = totalResults;
                 response.TotalPages = (int)Math.Ceiling((double)response.TotalRegister / pageSize);
-                response.Model = countries;
+                response.Model = services;
             }
             catch (Exception ex)
             {
                 response.DidError = true;
                 response.ErrorMessage = ex.ToString();
             }
-            
+
             return response.ToHttpResponse();
 
 
         }
 
-        // GET api/Service/5        
+        // GET api/Services/5        
         [HttpGet("{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
 
-        public async Task<IActionResult> GetCountryByIdAsync(int id)
+        public async Task<IActionResult> GetServiceByIdAsync(int id)
         {
-            var response = new SingleResponse<Country>();
+            var response = new SingleResponse<Service>();
 
             try
             {
-                var country = await _context.Countries.FindAsync(id);
+                var service = await _context.Services.FindAsync(id);
 
-                if (country == null)
+                if (service == null)
                 {
                     return NotFound();
                 }
-                response.Model = country;
+                response.Model = service;
             }
             catch (Exception ex)
             {
@@ -116,21 +116,21 @@ namespace TekusClientsAPI.Controllers
         }
 
 
-        // POST: api/CountryService
+        // POST: api/Serivce
         [HttpPost]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(((int)HttpStatusCode.InternalServerError))]
-        public async Task<IActionResult> PostCountryAsync([FromBody] Country country)
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> PostServiceAsync([FromBody] Service service)
         {
-            var response = new SingleResponse<Country>();
+            var response = new SingleResponse<Service>();
 
             try
             {
-                _context.Countries.Add(country);
+                _context.Services.Add(service);
                 await _context.SaveChangesAsync();
-                response.Model = CreatedAtAction(nameof(GetCountryByIdAsync), new { id = country.Id }, country).Value as Country;
+                response.Model = CreatedAtAction(nameof(GetServiceByIdAsync), new { id = service.Id }, service).Value as Service;
             }
             catch (Exception ex)
             {
@@ -141,6 +141,39 @@ namespace TekusClientsAPI.Controllers
             return response.ToHttpResponse();
         }
 
-        
+        // PUT: api/Service/5
+        [HttpPut("{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(((int)HttpStatusCode.InternalServerError))]
+        public async Task<IActionResult> PutServiceAsync(int id, [FromBody] Service service)
+        {
+            var response = new Response();
+
+            try
+            {
+                var serviceSelected = await _context.Services.FindAsync(id);
+                var serviceUpdated = service;
+
+                if (serviceSelected == null)
+                {
+                    return NotFound();
+                }
+                serviceSelected.Name = serviceUpdated.Name;
+                serviceSelected.Price = serviceUpdated.Price;
+
+                await _context.SaveChangesAsync();
+
+            }
+            catch (Exception ex)
+            {
+                response.DidError = true;
+                response.ErrorMessage = ex.Message;
+            }
+
+            return response.ToHttpResponse();
+
+        }
     }
 }
