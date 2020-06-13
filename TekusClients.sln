@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TekusClientsAPI", "TekusClients\TekusClientsAPI.csproj", "{48447797-BD3D-43BB-9055-97AA861C2B63}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TekusClientsAPI", "TekusClients\TekusClientsAPI.csproj", "{48447797-BD3D-43BB-9055-97AA861C2B63}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TekusClientsAPI.UnitTests", "TekusClientsAPI.UnitTests\TekusClientsAPI.UnitTests.csproj", "{BEC1C155-B61A-4556-9592-B127AF29F76D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{48447797-BD3D-43BB-9055-97AA861C2B63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48447797-BD3D-43BB-9055-97AA861C2B63}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48447797-BD3D-43BB-9055-97AA861C2B63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEC1C155-B61A-4556-9592-B127AF29F76D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEC1C155-B61A-4556-9592-B127AF29F76D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEC1C155-B61A-4556-9592-B127AF29F76D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEC1C155-B61A-4556-9592-B127AF29F76D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

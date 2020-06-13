@@ -26,7 +26,7 @@ namespace TekusClientsAPI.Controllers
         [HttpGet]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetServices(string filter, int page = 0, int pageSize = 15)
+        public async Task<IActionResult> GetServicesAsync(string filter, int page = 0, int pageSize = 15)
         {
             var response = new PagedResponse<Service>();
 
@@ -92,7 +92,7 @@ namespace TekusClientsAPI.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
 
-        public async Task<IActionResult> GetServiceById(int id)
+        public async Task<IActionResult> GetServiceByIdAsync(int id)
         {
             var response = new SingleResponse<Service>();
 
@@ -122,7 +122,7 @@ namespace TekusClientsAPI.Controllers
         [ProducesResponseType((int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(((int)HttpStatusCode.InternalServerError))]
-        public async Task<IActionResult> PostService([FromBody] Service service)
+        public async Task<IActionResult> PostServiceAsync([FromBody] Service service)
         {
             var response = new SingleResponse<Service>();
 
@@ -130,7 +130,7 @@ namespace TekusClientsAPI.Controllers
             {
                 _context.Services.Add(service);
                 await _context.SaveChangesAsync();
-                response.Model = CreatedAtAction(nameof(GetServiceById), new { id = service.Id }, service).Value as Service;
+                response.Model = CreatedAtAction(nameof(GetServiceByIdAsync), new { id = service.Id }, service).Value as Service;
             }
             catch (Exception ex)
             {
@@ -147,7 +147,7 @@ namespace TekusClientsAPI.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(((int)HttpStatusCode.InternalServerError))]
-        public async Task<IActionResult> PutService(int id, [FromBody] Service service)
+        public async Task<IActionResult> PutServiceAsync(int id, [FromBody] Service service)
         {
             var response = new Response();
 

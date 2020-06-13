@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TekusClientsAPI.Infrastructure;
@@ -14,11 +13,11 @@ namespace TekusClientsAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CountryServiceController : ControllerBase
+    public class CountryController : ControllerBase
     {
         private readonly ClientsContext _context;
 
-        public CountryServiceController(ClientsContext context)
+        public CountryController(ClientsContext context)
         {
             _context = context;
         }
@@ -27,28 +26,28 @@ namespace TekusClientsAPI.Controllers
         [HttpGet]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetCountryServices(string filter, int page = 0, int pageSize = 15)
+        public async Task<IActionResult> GetCountriesAsync(string filter, int page = 0, int pageSize = 15)
         {
-            var response = new PagedResponse<CountryService>();
+            var response = new PagedResponse<Country>();
 
             try
             {
 
-                List<CountryService> countryServices;
+                List<Country> countries;
                 long totalResults;
 
                 if (!string.IsNullOrEmpty(filter))
                 {
                     foreach (string item in filter.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
                     {
-                        countryServices = await _context.CountryServices
-                            .Where(c => c.Country.ToLower().StartsWith(item))
+                        countries = await _context.Countries
+                            .Where(c => c.Name.ToLower().StartsWith(item))
                             .Skip((page - 1) * pageSize)
                             .Take(pageSize)
                             .ToListAsync();
 
-                        totalResults = await _context.CountryServices
-                            .Where(c => c.Country.ToLower().StartsWith(item))
+                        totalResults = await _context.Countries
+                            .Where(c => c.Name.ToLower().StartsWith(item))
                             .LongCountAsync();
 
                         response.CurrentFilter = filter;
@@ -56,32 +55,32 @@ namespace TekusClientsAPI.Controllers
                         response.RegisterPerPages = pageSize;
                         response.TotalRegister = totalResults;
                         response.TotalPages = (int)Math.Ceiling((double)response.TotalRegister / pageSize);
-                        response.Model = countryServices;
+                        response.Model = countries;
 
                         return response.ToHttpResponse();
                     }
 
                 }
 
-                countryServices = _context.CountryServices.Skip((page - 1) * pageSize)
+                countries = _context.Countries.Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToList();
 
-                totalResults = await _context.CountryServices.LongCountAsync();
+                totalResults = await _context.Countries.LongCountAsync();
 
                 response.CurrentFilter = filter;
                 response.CurrentPage = page;
                 response.RegisterPerPages = pageSize;
                 response.TotalRegister = totalResults;
                 response.TotalPages = (int)Math.Ceiling((double)response.TotalRegister / pageSize);
-                response.Model = countryServices;
+                response.Model = countries;
             }
             catch (Exception ex)
             {
                 response.DidError = true;
                 response.ErrorMessage = ex.ToString();
             }
-
+            
             return response.ToHttpResponse();
 
 
@@ -93,19 +92,19 @@ namespace TekusClientsAPI.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
 
-        public async Task<IActionResult> GetCountryServiceById(int id)
+        public async Task<IActionResult> GetCountryByIdAsync(int id)
         {
-            var response = new SingleResponse<CountryService>();
+            var response = new SingleResponse<Country>();
 
             try
             {
-                var countryService = await _context.CountryServices.FindAsync(id);
+                var country = await _context.Countries.FindAsync(id);
 
-                if (countryService == null)
+                if (country == null)
                 {
                     return NotFound();
                 }
-                response.Model = countryService;
+                response.Model = country;
             }
             catch (Exception ex)
             {
@@ -123,15 +122,15 @@ namespace TekusClientsAPI.Controllers
         [ProducesResponseType((int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(((int)HttpStatusCode.InternalServerError))]
-        public async Task<IActionResult> PostCountryService([FromBody] CountryService countryService)
+        public async Task<IActionResult> PostCountryAsync([FromBody] Country country)
         {
-            var response = new SingleResponse<CountryService>();
+            var response = new SingleResponse<Country>();
 
             try
             {
-                _context.CountryServices.Add(countryService);
+                _context.Countries.Add(country);
                 await _context.SaveChangesAsync();
-                response.Model = CreatedAtAction(nameof(GetCountryServiceById), new { id = countryService.Id }, countryService).Value as CountryService;
+                response.Model = CreatedAtAction(nameof(GetCountryByIdAsync), new { id = country.Id }, country).Value as Country;
             }
             catch (Exception ex)
             {

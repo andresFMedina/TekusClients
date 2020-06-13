@@ -29,7 +29,7 @@ namespace TekusClientsAPI.Controllers
         [HttpGet]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetClients(string filter, int page = 0, int pageSize = 15)
+        public async Task<IActionResult> GetClientsAsync(string filter, int page = 0, int pageSize = 15)
         {
             var response = new PagedResponse<Client>();
 
@@ -95,7 +95,7 @@ namespace TekusClientsAPI.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         
-        public async Task<IActionResult> GetClientById(int id)
+        public async Task<IActionResult> GetClientByIdAsync(int id)
         {
             var response = new SingleResponse<Client>();
 
@@ -125,7 +125,7 @@ namespace TekusClientsAPI.Controllers
         [ProducesResponseType((int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(((int)HttpStatusCode.InternalServerError))]
-        public async Task<IActionResult> PostClient([FromBody] Client client)
+        public async Task<IActionResult> PostClientAsync([FromBody] Client client)
         {
             var response = new SingleResponse<Client>();
 
@@ -133,7 +133,7 @@ namespace TekusClientsAPI.Controllers
             {
                 _context.Clients.Add(client);
                 await _context.SaveChangesAsync();
-                response.Model = CreatedAtAction(nameof(GetClientById), new { id = client.Id }, client).Value as Client;
+                response.Model = CreatedAtAction(nameof(GetClientByIdAsync), new { id = client.Id }, client).Value as Client;
             }
             catch(Exception ex)
             {
@@ -150,7 +150,7 @@ namespace TekusClientsAPI.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(((int)HttpStatusCode.InternalServerError))]
-        public async Task<IActionResult> PutClient(int id, [FromBody] Client client)
+        public async Task<IActionResult> PutClientAsync(int id, [FromBody] Client client)
         {
             var response = new Response();
 
