@@ -24,19 +24,37 @@ namespace TekusClientsAPI
                 opt.UseSqlServer(Configuration.GetConnectionString("ConnectionLocal")));
 
             services.AddControllers();
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson(options => 
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowOrigin",
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:4200")
+                           .AllowAnyHeader()
+                           .AllowAnyMethod()
+                           .AllowCredentials();
+                        
+                    }
+                    );
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseRouting();
+
+            app.UseCors("AllowOrigin");
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
-
-            app.UseRouting();            
+            app.UseHttpsRedirection();            
 
             app.UseAuthorization();
 

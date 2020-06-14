@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ using TekusClientsAPI.Utils;
 
 namespace TekusClientsAPI.Controllers
 {
+    [EnableCors("AllowOrigin")]
     [Route("api/[controller]")]
     [ApiController]
     public class ServiceController : ControllerBase
@@ -26,6 +28,7 @@ namespace TekusClientsAPI.Controllers
         [HttpGet]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [EnableCors("AllowOrigin")]
         public async Task<IActionResult> GetServicesAsync(string filter="", int page = 1, int pageSize = 15)
         {
             var response = new PagedResponse<Service>();
@@ -91,6 +94,7 @@ namespace TekusClientsAPI.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [EnableCors("AllowOrigin")]
 
         public async Task<IActionResult> GetServiceByIdAsync(int id)
         {
@@ -122,6 +126,7 @@ namespace TekusClientsAPI.Controllers
         [ProducesResponseType((int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [EnableCors("AllowOrigin")]
         public async Task<IActionResult> PostServiceAsync([FromBody] Service service)
         {
             var response = new SingleResponse<Service>();
@@ -147,6 +152,7 @@ namespace TekusClientsAPI.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(((int)HttpStatusCode.InternalServerError))]
+        [EnableCors("AllowOrigin")]
         public async Task<IActionResult> PutServiceAsync(int id, [FromBody] Service service)
         {
             var response = new Response();

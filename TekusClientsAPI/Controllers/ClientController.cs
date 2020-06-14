@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ using TekusClientsAPI.Utils;
 
 namespace TekusClientsAPI.Controllers
 {
+    [EnableCors("AllowOrigin")]
     [Route("api/[controller]")]
     [ApiController]
     public class ClientController : ControllerBase
@@ -29,6 +31,7 @@ namespace TekusClientsAPI.Controllers
         [HttpGet]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [EnableCors("AllowOrigin")]
         public async Task<IActionResult> GetClientsAsync(string filter = "", int page = 1, int pageSize = 15)
         {
             var response = new PagedResponse<Client>();
@@ -94,7 +97,8 @@ namespace TekusClientsAPI.Controllers
         [ProducesResponseType((int) HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        
+        [EnableCors("AllowOrigin")]
+
         public async Task<IActionResult> GetClientByIdAsync(int id)
         {
             var response = new SingleResponse<Client>();
@@ -125,6 +129,7 @@ namespace TekusClientsAPI.Controllers
         [ProducesResponseType((int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [EnableCors("AllowOrigin")]
         public async Task<IActionResult> PostClientAsync([FromBody] Client client)
         {
             var response = new SingleResponse<Client>();
@@ -150,6 +155,7 @@ namespace TekusClientsAPI.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(((int)HttpStatusCode.InternalServerError))]
+        [EnableCors("AllowOrigin")]
         public async Task<IActionResult> PutClientAsync(int id, [FromBody] Client client)
         {
             var response = new Response();
