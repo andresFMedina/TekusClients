@@ -1,3 +1,18 @@
-<h1>Clients: {{clients.totalRegister}}</h1>
-<h1>Services: {{services.totalRegister}}</h1>
-<h1>Countries: {{countries.totalRegister}}</h1>
+<div class="header">
+  <img src="http://www.tekus.co/wp-content/uploads/LogoTekus4.png">
+</div>
+
+
+<div class="container">
+  <h4 *ngIf="clients">Clients: {{clients.totalRegister}}</h4>
+  <h4 *ngIf="services"> Services: {{services.totalRegister}}</h4>
+  <h4 *ngIf="countries">Countries: {{countries.totalRegister}}</h4>
+
+  <div *ngIf="countries">
+    <div *ngFor="let country of countries.model">
+      <h3> {{country.name}}: {{country.serviceCountries.length}}</h3>
+    </div>
+  </div>
+
+  <button (click)="restoreDatabase()">Restaurar información</button>
+</div>

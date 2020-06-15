@@ -53,13 +53,7 @@ namespace TekusClientsAPI.Controllers
                             .Where(c => c.Name.ToLower().StartsWith(item))
                             .LongCountAsync();
 
-                        response.CurrentFilter = filter;
-                        response.CurrentPage = page;
-                        response.RegisterPerPages = pageSize;
-                        response.TotalRegister = totalResults;
-                        response.TotalPages = (int)Math.Ceiling((double)response.TotalRegister / pageSize);
-                        response.Model = services;
-
+                        response = await createResponsePaginated(filter, page, pageSize, totalResults, services);
                         return response.ToHttpResponse();
                     }
 
@@ -71,12 +65,7 @@ namespace TekusClientsAPI.Controllers
 
                 totalResults = await _context.Services.LongCountAsync();
 
-                response.CurrentFilter = filter;
-                response.CurrentPage = page;
-                response.RegisterPerPages = pageSize;
-                response.TotalRegister = totalResults;
-                response.TotalPages = (int)Math.Ceiling((double)response.TotalRegister / pageSize);
-                response.Model = services;
+                response = await createResponsePaginated(filter, page, pageSize, totalResults, services);
             }
             catch (Exception ex)
             {
@@ -180,6 +169,24 @@ namespace TekusClientsAPI.Controllers
 
             return response.ToHttpResponse();
 
+        }
+
+        private async Task<PagedResponse<Service>> createResponsePaginated(string filter, int page, int pageSize, long totalResults, List<Service> services)
+        {
+            foreach (var service in services)
+            {
+                service.ServiceCountries = await _context.ServiceCountries.Where(cs => cs.ServiceId == service.Id).ToListAsync();
+            }
+
+            return new PagedResponse<Service>
+            {
+                CurrentFilter = filter,
+                CurrentPage = page,
+                RegisterPerPages = pageSize,
+                TotalRegister = totalResults,
+                TotalPages = (int)Math.Ceiling((double)totalResults / pageSize),
+                Model = services
+            };
         }
     }
 }
